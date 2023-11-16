@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Admin Chat</title>
+</head>
+<body>
+    <div id="chatLog"></div>
+    <input type="text" id="messageInput" placeholder="Type message for the client" onkeypress="sendMessage(event)">
+    <script>
+        const chatLog = document.getElementById('chatLog');
+        const messageInput = document.getElementById('messageInput');
+        const ws = new WebSocket('ws://localhost:8080'); // WebSocket server URL
+
+        ws.onmessage = (event) => {
+            chatLog.innerHTML += event.data + "<br>";
+        };
+
+        function sendMessage(event) {
+            if (event.key === 'Enter') {
+                const message = messageInput.value;
+                ws.send("Admin: " + message);
+                messageInput.value = '';
+            }
+        }
+    </script>
+</body>
+</html>

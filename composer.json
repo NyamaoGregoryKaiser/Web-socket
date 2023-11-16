@@ -1,0 +1,12 @@
+{
+    "name": "cosym/websocket",
+    "description": "help",
+    "autoload": {
+        "psr-4": {
+            "Cosym\\Websocket\\": "src/"
+        }
+    },
+    "require": {
+        "cboden/ratchet": "^0.4.4"
+    }
+}
