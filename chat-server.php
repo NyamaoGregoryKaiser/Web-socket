@@ -12,11 +12,15 @@ class ChatServer implements MessageComponentInterface
 {
     protected $clients;
     protected $admin;
+    protected $logicalClockP;
+    protected $logicalClockQ;
 
     public function __construct()
     {
         $this->clients = new \SplObjectStorage();
         $this->admin = null;
+        $this->logicalClockP = 0;
+        $this->logicalClockQ = 0;
     }
 
     public function onOpen(ConnectionInterface $conn)
@@ -47,13 +51,20 @@ class ChatServer implements MessageComponentInterface
 
     public function onMessage(ConnectionInterface $from, $msg)
     {
+        // Increment logical clock for the sender
+        if ($from === $this->admin) {
+            $this->logicalClockP++;
+        } else {
+            $this->logicalClockQ++;
+        }
+
         // Broadcast the message to all clients and the admin
         foreach ($this->clients as $client) {
-            $client->send($msg);
+            $client->send("ClockP: {$this->logicalClockP}, ClockQ: {$this->logicalClockQ} - " . $msg);
         }
 
         if ($this->admin !== null) {
-            $this->admin->send($msg);
+            $this->admin->send("ClockP: {$this->logicalClockP}, ClockQ: {$this->logicalClockQ} - " . $msg);
         }
     }
 

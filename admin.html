@@ -11,14 +11,23 @@
         const messageInput = document.getElementById('messageInput');
         const ws = new WebSocket('ws://localhost:8080'); // WebSocket server URL
 
+        let logicalClockP = 0;
+
         ws.onmessage = (event) => {
-            chatLog.innerHTML += event.data + "<br>";
+            const receivedData = event.data.split(' - ');
+            const logicalClocks = receivedData[0].match(/ClockP: (\d+), ClockQ: (\d+)/);
+
+            if (logicalClocks) {
+                logicalClockP = parseInt(logicalClocks[1], 10) + 1;
+            }
+
+            chatLog.innerHTML += `[P${logicalClockP}] ${receivedData[1]}<br>`;
         };
 
         function sendMessage(event) {
             if (event.key === 'Enter') {
                 const message = messageInput.value;
-                ws.send("Admin: " + message);
+                ws.send(`[P${logicalClockP}] Admin: ${message}`);
                 messageInput.value = '';
             }
         }

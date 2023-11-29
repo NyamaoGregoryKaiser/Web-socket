@@ -12,14 +12,23 @@
 
         const ws = new WebSocket('ws://localhost:8080'); // WebSocket server URL
 
+        let logicalClockQ = 0;
+
         ws.onmessage = (event) => {
-            chatLog.innerHTML += event.data + "<br>";
+            const receivedData = event.data.split(' - ');
+            const logicalClocks = receivedData[0].match(/ClockP: (\d+), ClockQ: (\d+)/);
+
+            if (logicalClocks) {
+                logicalClockQ = parseInt(logicalClocks[2], 10) + 1;
+            }
+
+            chatLog.innerHTML += `[Q${logicalClockQ}] ${receivedData[1]}<br>`;
         };
 
         function sendMessage(event) {
             if (event.key === 'Enter') {
                 const message = messageInput.value;
-                ws.send("Client: " + message);
+                ws.send(`[Q${logicalClockQ}] Client: ${message}`);
                 messageInput.value = '';
             }
         }
